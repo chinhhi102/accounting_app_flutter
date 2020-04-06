@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:accountingapp/models/category_model.dart';
 import 'package:accountingapp/models/choise_model.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'file:///D:/Flutter/accounting_app/lib/tabs/category_tab.dart' as category_tab;
 import 'file:///D:/Flutter/accounting_app/lib/tabs/store_tab.dart' as store_tab;
+import 'file:///D:/Flutter/accounting_app/lib/tabs/report_tab.dart' as report_tab;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -13,13 +17,29 @@ class HomePageScreen extends StatefulWidget {
 class _HomePageScreenState extends State<HomePageScreen>
     with SingleTickerProviderStateMixin {
   TabController _controller;
+  final FirebaseDatabase _database = FirebaseDatabase.instance;
+  StreamSubscription<Event> _onCateAddedSubscription;
+  Query _CateQuery;
+  int total = 0;
 
   @override
   void initState() {
     super.initState();
     _controller =
         new TabController(initialIndex: 0, vsync: this, length: choices.length);
+    _CateQuery = _database.reference().child("Categories").orderByChild("name");
+    _onCateAddedSubscription = _CateQuery.onChildAdded.listen(onEntryAdded);
   }
+
+  onEntryAdded(Event event) {
+    DataSnapshot snapshot = event.snapshot;
+    if(!snapshot.value['hiden']) {
+      setState(() {
+        ++total;
+      });
+    }
+  }
+
 
   @override
   void dispose() {
@@ -63,50 +83,54 @@ class _HomePageScreenState extends State<HomePageScreen>
         children: <Widget>[
           Column(
             children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          'Welcome!',
-                          style: GoogleFonts.openSans(
-                            textStyle: TextStyle(
-                              color: Colors.teal,
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: 240,
-                          child: Text(
-                            'I hope your morning is as bright as your smile.!',
+              SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'Welcome!',
                             style: GoogleFonts.openSans(
                               textStyle: TextStyle(
                                 color: Colors.teal,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      'Total: ${categories.length} products',
-                      style: GoogleFonts.openSans(
-                        textStyle: TextStyle(
-                          color: Colors.teal,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                          Container(
+                            width: 180,
+                            child: Text(
+                              'I hope your morning is as bright as your smile.!',
+                              style: GoogleFonts.openSans(
+                                textStyle: TextStyle(
+                                  color: Colors.teal,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        'Total: ${total} products',
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.openSans(
+                          textStyle: TextStyle(
+                            color: Colors.teal,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               Flexible(
@@ -180,7 +204,7 @@ class _HomePageScreenState extends State<HomePageScreen>
           ),
           new category_tab.CategoryTab(),
           new store_tab.StoreTab(),
-          new category_tab.CategoryTab(),
+          new report_tab.ReportTab(),
         ],
       ),
     );

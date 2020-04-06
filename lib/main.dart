@@ -1,4 +1,5 @@
 import 'package:accountingapp/screens/homepage_screen.dart';
+import 'package:accountingapp/tabs/store_tab.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());

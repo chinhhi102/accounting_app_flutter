@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "370696288332",
+    "firebase_url": "https://accouting-app.firebaseio.com",
+    "project_id": "accouting-app",
+    "storage_bucket": "accouting-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:370696288332:android:b42d5a9af1839fa0619ce9",
+        "android_client_info": {
+          "package_name": "com.example.accountingapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "370696288332-lp7ksslj01p2ks06fl004ot8uokgk1q4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcS7gPynmtDL3uCVAfXr8VUIblyCeNuA8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "370696288332-lp7ksslj01p2ks06fl004ot8uokgk1q4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
