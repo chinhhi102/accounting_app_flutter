@@ -330,11 +330,16 @@ class _ReportTabState extends State<ReportTab> {
           return Loading();
         } else {
           listCate = new List();
-          snapshot.data.snapshot.value.forEach((key, value) {
-            Category cate = Category.fromMap(Map<String, dynamic>.from(value));
-            cate.id = key;
-            listCate.add(cate);
-          });
+          if (snapshot.data.snapshot.value == null) {
+            listCate.add(Category.empty());
+          } else {
+            snapshot.data.snapshot.value.forEach((key, value) {
+              Category cate =
+                  Category.fromMap(Map<String, dynamic>.from(value));
+              cate.id = key;
+              listCate.add(cate);
+            });
+          }
           return StreamBuilder(
             stream: _activityRef.onValue,
             builder: (context, snapshot) {
@@ -387,8 +392,8 @@ class _ReportTabState extends State<ReportTab> {
                                       height: 10.0,
                                       width: 10.0,
                                       child: DecoratedBox(
-                                        decoration: BoxDecoration(
-                                            color: Colors.red),
+                                        decoration:
+                                            BoxDecoration(color: Colors.red),
                                       ),
                                     ),
                                     Text(
@@ -412,7 +417,8 @@ class _ReportTabState extends State<ReportTab> {
                                     ),
                                     Text(
                                       'Hết hạn',
-                                      style: TextStyle(color: Colors.yellow[700]),
+                                      style:
+                                          TextStyle(color: Colors.yellow[700]),
                                     ),
                                   ],
                                 ),

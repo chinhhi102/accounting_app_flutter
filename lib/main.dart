@@ -1,6 +1,11 @@
-import 'package:accountingapp/screens/homepage_screen.dart';
-import 'package:accountingapp/tabs/store_tab.dart';
+import 'file:///D:/Flutter/accounting_app/lib/screens/home/homepage_screen.dart';
+import 'package:accountingapp/screens/wrapper.dart';
+import 'package:accountingapp/service/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'models/user_model.dart';
 
 void main() => runApp(MyApp());
 
@@ -14,9 +19,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         // Define the default brightness and colors.
         brightness: Brightness.light,
-        primaryColor: Color(0xFF00BFA5),
-        accentColor: Colors.green[300],
-        scaffoldBackgroundColor: Color(0xFFB9F6CA),
+        primaryColor: Colors.blue[600],
+        accentColor: Colors.blue[300],
+        scaffoldBackgroundColor: Colors.blue[50],
 
         // Define the default font family.
         fontFamily: 'Georgia',
@@ -29,7 +34,12 @@ class MyApp extends StatelessWidget {
           body1: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
         ),
       ),
-      home: HomePageScreen(),
+      home: StreamProvider<User>.value(
+          value: AuthService().user,
+        child: MaterialApp(
+          home: Wrapper(),
+        ),
+      ),
     );
   }
 }

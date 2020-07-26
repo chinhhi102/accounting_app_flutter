@@ -52,20 +52,24 @@ class _StoreTabState extends State<StoreTab> {
     _database.reference().child("Activities").orderByKey().once().then((
         DataSnapshot snapshot) {
       Map<dynamic, dynamic> values = snapshot.value;
-      values.forEach((key, value) {
-        int _t = value['createAt'];
-        String _h = value['categoryID'];
-        if (_t > date1
-            .toUtc()
-            .millisecondsSinceEpoch && _t < date2
-            .toUtc()
-            .millisecondsSinceEpoch) {
-          if(value['type'] == 1) {
-            solds.containsKey(_h) ? solds[_h] += value['quantify'] : solds[_h] =
-            value['quantify'];
+      if(values != null) {
+        values.forEach((key, value) {
+          int _t = value['createAt'];
+          String _h = value['categoryID'];
+          if (_t > date1
+              .toUtc()
+              .millisecondsSinceEpoch && _t < date2
+              .toUtc()
+              .millisecondsSinceEpoch) {
+            if (value['type'] == 1) {
+              solds.containsKey(_h)
+                  ? solds[_h] += value['quantify']
+                  : solds[_h] =
+              value['quantify'];
+            }
           }
-        }
-      });
+        });
+      }
     });
 
     _onCateAddedSubscription = _CateQuery.onChildAdded.listen(onEntryAdded);

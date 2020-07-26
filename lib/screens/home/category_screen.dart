@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:accountingapp/animation/LoadingProcess_animation.dart';
 import 'package:accountingapp/animation/loading_animation.dart';
 import 'package:accountingapp/models/category_model.dart';
 import 'package:accountingapp/notifier/connectivity_notifer.dart';
@@ -26,11 +27,11 @@ class CategoryScreen extends StatefulWidget {
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
-
   final AuthService authService = AuthService();
 
   FocusNode myFocus = new FocusNode();
   File imageFile;
+  bool saved = false;
 
   final FirebaseDatabase _database = FirebaseDatabase.instance;
   final StorageReference firebaseStorageRef = FirebaseStorage.instance.ref();
@@ -49,18 +50,34 @@ class _CategoryScreenState extends State<CategoryScreen> {
   }
 
   addNewCate() {
-    Category cate = new Category(
-        widget._category.name, widget._category.description,
-        widget._category.imageUrl,
-        widget._category.cost, widget._category.price,
-        widget._category.quantify);
-    _database.reference().child("Categories").push().set(cate.toJson());
+    try {
+      Category cate = new Category(
+          widget._category.name,
+          widget._category.description,
+          widget._category.imageUrl,
+          widget._category.cost,
+          widget._category.price,
+          widget._category.quantify);
+      var task = _database.reference().child("Categories").push().set(cate.toJson());
+      task.whenComplete(() {
+        setState(() {
+          saved = true;
+        });
+      });
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
   }
 
   updateCate() {
     //Toggle completed
-    _database.reference().child("Categories").child(widget._category.id).set(
-        widget._category.toJson());
+    _database
+        .reference()
+        .child("Categories")
+        .child(widget._category.id)
+        .set(widget._category.toJson());
   }
 
   Widget _buildNameField() {
@@ -83,6 +100,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         if (value.isEmpty) {
           return 'Tên loại không được bỏ trống!';
         }
+        return null;
       },
       onSaved: (String value) {
         widget._category.name = value;
@@ -119,8 +137,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
         color: Colors.black54,
         decorationColor: Colors.black54,
       ),
-      initialValue: widget._category.cost == null ? '' : widget._category.cost
-          .toString(),
+      initialValue:
+          widget._category.cost == null ? '' : widget._category.cost.toString(),
       decoration: InputDecoration(
         labelText: 'Chi phí',
         hintText: 'Chi phí sản xuất 1 sản phẩm',
@@ -138,6 +156,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         if (_cost == null || _cost <= 0) {
           return 'Chi phí sản phẩm không hợp lệ';
         }
+        return null;
       },
       onSaved: (String value) {
         int _cost = int.tryParse(value);
@@ -153,8 +172,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
         color: Colors.black54,
         decorationColor: Colors.black54,
       ),
-      initialValue: widget._category.price == null ? '' : widget._category.price
-          .toString(),
+      initialValue: widget._category.price == null
+          ? ''
+          : widget._category.price.toString(),
       decoration: InputDecoration(
         labelText: 'Gía bán',
         hintText: 'Giá của 1 sản phẩm',
@@ -172,6 +192,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         if (_cost == null || _cost <= 0) {
           return 'Giá sản phẩm không hợp lệ';
         }
+        return null;
       },
       onSaved: (String value) {
         int _price = int.tryParse(value);
@@ -228,30 +249,61 @@ class _CategoryScreenState extends State<CategoryScreen> {
     );
   }
 
-  Widget _decideImageView(){
-    if(imageFile == null){
+  void _onLoading() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            height: 50.0,
+            child: new Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                new LoadingProcessAnimation(),
+                SizedBox(width: 20.0,),
+                new Text("Saving..."),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+    new Future.delayed(new Duration(seconds: 3), () {
+      Navigator.pop(context); //pop dialog
+    });
+  }
+
+  Widget _decideImageView() {
+    if (imageFile == null) {
       if (widget._category.imageUrl != '') {
         Image _image = new Image.network(widget._category.imageUrl);
         bool _loading = true;
 
         _image.image.resolve(ImageConfiguration()).addListener(
             ImageStreamListener((ImageInfo image, bool synchronousCall) {
-              if (mounted) {
-                setState(() {
-                  _loading = false;
-                });
-              }
-            }));
+          if (mounted) {
+            setState(() {
+              _loading = false;
+            });
+          }
+        }));
 
-        return _loading ? Loading() : Image(
-          image: NetworkImage(widget._category.imageUrl),
-          width: 200.0,
-          height: 200.0,);
+        return _loading
+            ? Loading()
+            : Image(
+                image: NetworkImage(widget._category.imageUrl),
+                width: 200.0,
+                height: 200.0,
+              );
       } else {
         return Text('Chưa có hình nào');
       }
     } else {
-      return Image.file(imageFile, width: 200.0, height: 200.0,);
+      return Image.file(
+        imageFile,
+        width: 200.0,
+        height: 200.0,
+      );
     }
   }
 
@@ -333,32 +385,16 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   ),
                   onPressed: () async {
                     bool check = await _checkInternetConnectivity();
-                    if(check){
+                    if (check) {
                       return;
                     }
                     if (!_formKey.currentState.validate()) {
                       return;
                     }
-                    dynamic result = await authService.signInAnon();
-                    if (result != null) {
-                      if (imageFile != null) {
-                        String fileName = path.basename(imageFile.path);
-                        final StorageReference ref = firebaseStorageRef.child(
-                            fileName);
-                        final StorageUploadTask task = ref.putFile(imageFile);
-                        widget._category.imageUrl =
-                        await ref.getDownloadURL() as String;
-                      }
-                      await _formKey.currentState.save();
-                      if (widget._category.id == '0') {
-                        await addNewCate();
-                      } else {
-                        await updateCate();
-                      }
-                    }
+                    await _savingData();
                     Navigator.of(context).pop();
                   },
-                )
+                ),
               ],
             ),
           ),
@@ -367,29 +403,54 @@ class _CategoryScreenState extends State<CategoryScreen> {
     );
   }
 
-    Future<bool> _checkInternetConnectivity() async {
+  _savingData() async {
+    _onLoading();
+    if (imageFile != null) {
+      String fileName = path.basename(imageFile.path);
+      final StorageReference ref =
+      firebaseStorageRef.child(fileName);
+      final StorageUploadTask task = ref.putFile(imageFile);
+      widget._category.imageUrl =
+          await (await task.onComplete).ref.getDownloadURL();
+    }
+    await _formKey.currentState.save();
+    if (widget._category.id == '0') {
+      bool status = await addNewCate();
+      if (status) {
+        _showDialog("Thông báo", "Thêm thành công");
+      } else {
+        _showDialog("Thông báo", "Thêm thất bại");
+      }
+    } else {
+      await updateCate();
+    }
+  }
+
+  Future<bool> _checkInternetConnectivity() async {
     var result = await Connectivity().checkConnectivity();
-    if(result == ConnectivityResult.none) {
+    if (result == ConnectivityResult.none) {
       _showDialog('No internet', "You're not connected to a network");
       return true;
     }
     return false;
   }
-  _showDialog(title, text){
-    showDialog(context: context, builder: (context){
-      return AlertDialog(
-        title: Text(title),
-        content: Text(text),
-        actions: <Widget>[
-          FlatButton(
-            child: Text('Ok'),
-            onPressed: (){
-              Navigator.of(context).pop();
-            },
-          )
-        ],
-      );
-    });
-  }
 
+  _showDialog(title, text) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(title),
+            content: Text(text),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Ok'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
+  }
 }

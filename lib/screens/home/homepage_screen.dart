@@ -2,10 +2,13 @@ import 'dart:async';
 
 import 'package:accountingapp/models/category_model.dart';
 import 'package:accountingapp/models/choise_model.dart';
+import 'package:accountingapp/service/auth_service.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'file:///D:/Flutter/accounting_app/lib/tabs/category_tab.dart' as category_tab;
+import 'file:///D:/Flutter/accounting_app/lib/tabs/category_tab.dart'
+    as category_tab;
 import 'file:///D:/Flutter/accounting_app/lib/tabs/store_tab.dart' as store_tab;
-import 'file:///D:/Flutter/accounting_app/lib/tabs/report_tab.dart' as report_tab;
+import 'file:///D:/Flutter/accounting_app/lib/tabs/report_tab.dart'
+    as report_tab;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -33,13 +36,12 @@ class _HomePageScreenState extends State<HomePageScreen>
 
   onEntryAdded(Event event) {
     DataSnapshot snapshot = event.snapshot;
-    if(!snapshot.value['hiden']) {
+    if (!snapshot.value['hiden']) {
       setState(() {
         ++total;
       });
     }
   }
-
 
   @override
   void dispose() {
@@ -49,11 +51,12 @@ class _HomePageScreenState extends State<HomePageScreen>
 
   @override
   Widget build(BuildContext context) {
+    AuthService _auth = AuthService();
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         title: const Text(
-          'Trang\'s Family',
+          'Accounting App',
           style: TextStyle(
             fontSize: 25.0,
             fontWeight: FontWeight.w600,
@@ -97,7 +100,7 @@ class _HomePageScreenState extends State<HomePageScreen>
                             'Welcome!',
                             style: GoogleFonts.openSans(
                               textStyle: TextStyle(
-                                color: Colors.teal,
+                                color: Colors.blue[900],
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -109,13 +112,21 @@ class _HomePageScreenState extends State<HomePageScreen>
                               'I hope your morning is as bright as your smile.!',
                               style: GoogleFonts.openSans(
                                 textStyle: TextStyle(
-                                  color: Colors.teal,
+                                  color: Colors.blue[900],
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
                           ),
+                          FlatButton.icon(
+                            onPressed: () async {
+                              await _auth.signOut();
+                            },
+                            icon: Icon(Icons.person),
+                            label: Text("Logout"),
+                          )
+
                         ],
                       ),
                       Text(
@@ -123,7 +134,7 @@ class _HomePageScreenState extends State<HomePageScreen>
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.openSans(
                           textStyle: TextStyle(
-                            color: Colors.teal,
+                            color: Colors.blue[900],
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),

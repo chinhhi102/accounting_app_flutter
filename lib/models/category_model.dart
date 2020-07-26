@@ -11,10 +11,13 @@ class Category {
   bool hiden;
 
   Category(this.name, this.description, this.imageUrl, this.cost, this.price,
-      this.quantify) : this.hiden = false;
+      this.quantify)
+      : this.hiden = false;
 
   Category.empty()
       : id = '0',
+        name = '',
+        description = '',
         quantify = 0,
         imageUrl = '',
         hiden = false;

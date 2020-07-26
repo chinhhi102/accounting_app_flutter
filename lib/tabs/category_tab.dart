@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:accountingapp/animation/loading_animation.dart';
 import 'package:accountingapp/models/category_model.dart';
-import 'package:accountingapp/screens/category_screen.dart';
+import 'file:///D:/Flutter/accounting_app/lib/screens/home/category_screen.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -105,6 +105,7 @@ class _CategoryTabState extends State<CategoryTab> {
   }
 
   Widget showImg(String url) {
+    print(url);
     if(url.length > 0){
       Image _image = new Image.network(url);
       bool _loading = true;
@@ -118,14 +119,14 @@ class _CategoryTabState extends State<CategoryTab> {
       }));
 
       return _loading ? Loading() : CircleAvatar(
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.green,
+        backgroundColor: Colors.blue[300],
+        foregroundColor: Colors.blue[300],
         backgroundImage: NetworkImage(url),
       );
     } else {
       return CircleAvatar(
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.green,
+        backgroundColor: Colors.blue[300],
+        foregroundColor: Colors.blue[300],
         backgroundImage: AssetImage('assets/images/rau_cau.jpg'),
       );
     }
@@ -183,7 +184,7 @@ class _CategoryTabState extends State<CategoryTab> {
                                 data.name,
                                 style: GoogleFonts.openSans(
                                   textStyle: TextStyle(
-                                    color: Colors.tealAccent[400],
+                                    color: Colors.blue[900],
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -195,7 +196,7 @@ class _CategoryTabState extends State<CategoryTab> {
                                   data.description,
                                   style: GoogleFonts.openSans(
                                     textStyle: TextStyle(
-                                      color: Colors.tealAccent[700],
+                                      color: Colors.blue[300],
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -228,7 +229,7 @@ class _CategoryTabState extends State<CategoryTab> {
                                       CategoryScreen(data)),
                                 );
                               },
-                              color: Colors.teal,
+                              color: Colors.blue[900],
                               icon: Icon(Icons.edit),
                             ),
                             IconButton(
@@ -292,7 +293,7 @@ class _CategoryTabState extends State<CategoryTab> {
                       builder: (context) => CategoryScreen(Category.empty())),
                 );
               },
-              color: Colors.teal,
+              color: Colors.blue[300],
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(50.0),
               ),
@@ -302,7 +303,7 @@ class _CategoryTabState extends State<CategoryTab> {
               'Danh sách loại',
               style: GoogleFonts.openSans(
                 textStyle: TextStyle(
-                  color: Colors.teal,
+                  color: Colors.blue[900],
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
