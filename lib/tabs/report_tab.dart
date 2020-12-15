@@ -26,6 +26,7 @@ class _ReportTabState extends State<ReportTab> {
   List<Task> listTask;
   RandomColor _randomColor = RandomColor();
   Map<String, Acti> listActi;
+  Map<int, Activity> Actis;
   int indexed = 0;
 
   _generateLine(lineChart, id, color) {
@@ -144,6 +145,15 @@ class _ReportTabState extends State<ReportTab> {
       print(res);
       return res;
     });
+  }
+
+  Widget _buildHistory(context, snapshot){
+    for(int i = 0; i < 3; ++i){
+      snapshot.data.snapshot.value.forEach((key, value) {
+        Activity n = Activity.fromMap(Map<String, dynamic>.from(value));
+
+      });
+    }
   }
 
   Widget _buildChildLineChart(title, _key, context, snapshot) {
@@ -346,6 +356,16 @@ class _ReportTabState extends State<ReportTab> {
               if (!snapshot.hasData) {
                 return Loading();
               } else {
+                Actis = new Map();
+
+                if (snapshot.data.snapshot.value != null) {
+                  int k = 0;
+                  snapshot.data.snapshot.value.forEach((key, value) {
+                    Activity n = Activity.fromMap(Map<String, dynamic>.from(value));
+//                    Actis[k++] = n;
+                  });
+                }
+
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
@@ -353,6 +373,31 @@ class _ReportTabState extends State<ReportTab> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
+                          Column(
+                            children: <Widget>[
+                              Card(
+                                child: ListTile(
+                                  title: Text("Chuối"),
+                                  subtitle: Text("Nhập 20 sản phẩm 16/12/2020"),
+                                ),
+                              ),
+                              Card(
+                                child: ListTile(
+                                  title: Text("Chuối Nải"),
+                                  subtitle: Text("Nhập 15 sản phẩm 16/12/2020"),
+                                ),
+                              ),
+                              Card(
+                                child: ListTile(
+                                  title: Text("Chuối Nải"),
+                                  subtitle: Text("Bán 1 sản phẩm 16/12/2020"),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 20.0,
+                          ),
                           _buildPieChart(
                               'Doanh thu 7 ngày qua', context, snapshot, 7, 0),
                           SizedBox(
